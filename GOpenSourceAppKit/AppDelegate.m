@@ -62,7 +62,7 @@
         // 初始化 GizWifiSDK
         [GizWifiSDK sharedInstance].delegate = self;
         if ([GosCommon sharedInstance].cloudDomainDict.count > 0) {
-            [GizWifiSDK startWithAppID:APP_ID specialProductKeys:nil cloudServiceInfo:[GosCommon sharedInstance].cloudDomainDict autoSetDeviceDomain:NO];
+            [GizWifiSDK startWithAppID:APP_ID specialProductKeys:[GosCommon sharedInstance].productKey cloudServiceInfo:[GosCommon sharedInstance].cloudDomainDict autoSetDeviceDomain:NO];
         } else {
             //设置服务器
             GosCommon *common = [GosCommon sharedInstance];

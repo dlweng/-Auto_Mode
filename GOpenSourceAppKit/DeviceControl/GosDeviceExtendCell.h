@@ -11,9 +11,9 @@
 @class GosDeviceExtendCell;
 @protocol GosDeviceExtendCellDelegete <NSObject>
 
-- (void)deviceExtendCell:(GosDeviceExtendCell *)cell valueChanged:(NSString *)text;
-- (void)deviceExtendCellEndEditing:(GosDeviceExtendCell *)cell;
+//- (void)deviceExtendCellEndEditing:(GosDeviceExtendCell *)cell;
 - (void)deviceExtendCellBeginEditing:(GosDeviceExtendCell *)cell;
+- (void)deviceExtendCellEditStop:(GosDeviceExtendCell *)cell value:(NSString *)value;
 
 @end
 

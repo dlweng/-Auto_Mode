@@ -176,106 +176,6 @@
             [slideCell initUI];
             return cell;
         }
-//        case 0:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 1:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 2:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 3:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 4:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 5:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 6:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 7:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-//        case 8:
-//        {
-//            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:GosDeviceExtendCellReuseIdentifier forIndexPath:indexPath];
-//            GosDeviceExtendCell *extendCell = (GosDeviceExtendCell *)cell;
-//            extendCell.title = @"扩展可写";
-//            extendCell.value = @"FFE463248234354332384732894723942385674723484";
-//            extendCell.isWrite = YES;
-//            extendCell.tag = indexPath.row;
-//            extendCell.delegate = self;
-//            return cell;
-//        }
-
         default:
             return nil;
     }
@@ -308,11 +208,6 @@
 }
 
 #pragma mark - GosDeviceExtendCellDelegete
-- (void)deviceExtendCell:(GosDeviceExtendCell *)cell valueChanged:(NSString *)text
-{
-    NSLog(@"ExtendCell用户输入的值为%@", text);
-}
-
 - (void)deviceExtendCellBeginEditing:(GosDeviceExtendCell *)cell
 {
     CGPoint viewCenter = self.view.center;
@@ -357,6 +252,11 @@
     }
 }
 
+- (void)deviceExtendCellEditStop:(GosDeviceExtendCell *)cell value:(NSString *)value
+{
+    NSLog(@"textView设置的最新值:value = %@", value);
+}
+
 
 #pragma mark - keyboard事件
 - (void)setKeyboardNotification
@@ -369,21 +269,6 @@
 - (void)keyBoardFrameChange:(NSNotification *)notification
 {
     // 移动键盘的时候恢复tableView在界面的位置
-    CGPoint viewCenter = self.view.center;
-    if (self.tableView.center.y != viewCenter.y)
-    {
-        // 初始化tableView的位置
-        self.tableView.center = CGPointMake(viewCenter.x, viewCenter.y);
-    }
-}
-
-
-// 结束编辑
-- (void)deviceExtendCellEndEditing:(GosDeviceExtendCell *)cell
-{
-    [self.tableView endEditing:YES];
-    
-    // 结束编辑时恢复tableView在界面的位置
     CGPoint viewCenter = self.view.center;
     if (self.tableView.center.y != viewCenter.y)
     {

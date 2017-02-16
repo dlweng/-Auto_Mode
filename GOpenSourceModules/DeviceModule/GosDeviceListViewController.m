@@ -103,6 +103,7 @@
     if (token.length == 0) {
         token = nil;
     }
+    NSLog(@"productKey = %@", [GosCommon sharedInstance].productKey);
     [[GizWifiSDK sharedInstance] getBoundDevices:uid token:token specialProductKeys:[GosCommon sharedInstance].productKey];
 }
 

@@ -8,7 +8,7 @@
 
 #import "GosDeviceExtendCell.h"
 
-#define NUM @"0123456789ABCDEF"
+#define EffectiveNum @"0123456789ABCDEF"
 
 @interface GosDeviceExtendCell()<UITextViewDelegate>
 
@@ -44,13 +44,18 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     if ([text isEqualToString:@"\n"]) {
+        // 输入结束
+        if ([self.delegate respondsToSelector:@selector(deviceExtendCellEditStop:value:)])
+        {
+            [self.delegate deviceExtendCellEditStop:self value:self.value];
+        }
         [textView resignFirstResponder];
         return NO;
     }
     NSLog(@"text = %@", text);
     NSLog(@"range.location = %zd, range.length = %zd", range.location, range.length);
     
-    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:NUM] invertedSet];
+    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:EffectiveNum] invertedSet];
     NSString *filtered = [[text componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
     
     
@@ -88,11 +93,119 @@
     
     [self refreshCellByValue];
     self.value = [self getStrByDeleteSpace:textView.text];
-    if ([self.delegate respondsToSelector:@selector(deviceExtendCell:valueChanged:)])
-    {
-        [self.delegate deviceExtendCell:self valueChanged:self.value];
-    }
     NSLog(@"焦点： %zd", textView.selectedRange.location);
+}
+
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    if ([self.delegate respondsToSelector:@selector(deviceExtendCellBeginEditing:)])
+    {
+        [self.delegate deviceExtendCellBeginEditing:self];
+    }
+}
+
+//- (void)textViewDidEndEditing:(UITextView *)textView
+//{
+//    if ([self.delegate respondsToSelector:@selector(textViewDidEndEditing:)])
+//    {
+//        [self.delegate deviceExtendCellEndEditing:self];
+//    }
+//    
+//}
+
+- (void)refreshCellByValue
+{
+    CGRect bounds = self.valueTextView.bounds;
+    CGSize maxSize = CGSizeMake(bounds.size.width, MAXFLOAT);
+    CGSize newSize = [self.valueTextView sizeThatFits:maxSize];
+    bounds.size = newSize;
+    
+    self.valueTextView.bounds = bounds;
+    
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
+}
+
+#pragma 字符串格式转换
+// 获取去除空格的字符串
+- (NSString *)getStrByDeleteSpace:(NSString *)str
+{
+    return [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+}
+
+// 将一个普通字符串格式化成每隔两位加一个空格的形式
+// str字符串格式: 63423
+// return的字符串格式: 63 42 3
+- (NSString *)getFormateStringByStr:(NSString *)str
+{
+    // 删除所有空格
+    str = [NSMutableString stringWithFormat:@"%@", [str stringByReplacingOccurrencesOfString:@" " withString:@""]];
+    NSInteger length = str.length;
+    if (length <= 2)
+    {
+        return str;
+    }
+    
+    // 计算格式化后的字符串长度
+    NSInteger formateLength = (length / 2 - 1) + length;
+    if (length % 2 > 0)
+    {
+        formateLength++;
+    }
+    NSLog(@"formateLength = %zd", formateLength);
+    
+    // 每两位添加一个空格
+    NSMutableString *endStr = [NSMutableString stringWithString:str];
+    
+    for (int i = 0; i < formateLength; ++i)
+    {
+        if (i > 0 && (i+1) % 3 == 0)
+        {
+            NSString *tempStr = [endStr substringToIndex:i];
+            tempStr = [tempStr stringByAppendingString:@" "];
+            [endStr replaceCharactersInRange:NSMakeRange(0, i) withString:tempStr];
+            
+        }
+    }
+    
+    return endStr;
+}
+
+#pragma mark - Properity
+- (void)setTitle:(NSString *)title
+{
+    _title = title;
+    self.titleLabel.text = title;
+}
+
+- (void)setIsWrite:(BOOL)isWrite
+{
+    _isWrite = isWrite;
+    if (!isWrite)
+    {
+        self.titleLabel.textColor = [UIColor darkGrayColor];
+        self.valueTextView.textColor = [UIColor darkGrayColor];
+        self.userInteractionEnabled = NO;
+    }
+}
+
+- (void)setValue:(NSString *)value
+{
+    _value = value;
+    self.valueTextView.text = [self getFormateStringByStr:value];
+}
+
+- (UITableView *)tableView
+{
+    if (_tableView == nil)
+    {
+        UIView *tableView = self.superview;
+        if (![tableView isKindOfClass:[UITableView class]] && tableView)
+        {
+            _tableView = (UITableView *)(tableView.superview);
+        }
+    }
+    return _tableView;
 }
 
 
@@ -186,35 +299,7 @@
 
 
 
-- (void)textViewDidBeginEditing:(UITextView *)textView
-{
-    if ([self.delegate respondsToSelector:@selector(deviceExtendCellBeginEditing:)])
-    {
-        [self.delegate deviceExtendCellBeginEditing:self];
-    }
-}
 
-- (void)textViewDidEndEditing:(UITextView *)textView
-{
-    if ([self.delegate respondsToSelector:@selector(textViewDidEndEditing:)])
-    {
-        [self.delegate deviceExtendCellEndEditing:self];
-    }
-
-}
-
-- (void)refreshCellByValue
-{
-    CGRect bounds = self.valueTextView.bounds;
-    CGSize maxSize = CGSizeMake(bounds.size.width, MAXFLOAT);
-    CGSize newSize = [self.valueTextView sizeThatFits:maxSize];
-    bounds.size = newSize;
-    
-    self.valueTextView.bounds = bounds;
-    
-    [self.tableView beginUpdates];
-    [self.tableView endUpdates];
-}
 
 //// 监听回车事件
 //- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
@@ -228,29 +313,7 @@
 //    return YES;
 //}
 
-#pragma mark - Properity
-- (void)setTitle:(NSString *)title
-{
-    _title = title;
-    self.titleLabel.text = title;
-}
 
-- (void)setIsWrite:(BOOL)isWrite
-{
-    _isWrite = isWrite;
-    if (!isWrite)
-    {
-        self.titleLabel.textColor = [UIColor darkGrayColor];
-        self.valueTextView.textColor = [UIColor darkGrayColor];
-        self.userInteractionEnabled = NO;
-    }
-}
-
-- (void)setValue:(NSString *)value
-{
-    _value = value;
-    self.valueTextView.text = [self getFormateStringByStr:value];
-}
 
 
 #pragma mark - 字符串的格式化处理
@@ -312,62 +375,5 @@
 //    return text;
 //}
 
-// 获取去除空格的字符串
-- (NSString *)getStrByDeleteSpace:(NSString *)str
-{
-    return [str stringByReplacingOccurrencesOfString:@" " withString:@""];
-}
-
-// 将一个普通字符串格式化成每隔两位加一个空格的形式
-// str字符串格式: 63423
-// return的字符串格式: 63 42 3
-- (NSString *)getFormateStringByStr:(NSString *)str
-{
-    // 删除所有空格
-    str = [NSMutableString stringWithFormat:@"%@", [str stringByReplacingOccurrencesOfString:@" " withString:@""]];
-    NSInteger length = str.length;
-    if (length <= 2)
-    {
-        return str;
-    }
-    
-    // 计算格式化后的字符串长度
-    NSInteger formateLength = (length / 2 - 1) + length;
-    if (length % 2 > 0)
-    {
-        formateLength++;
-    }
-    NSLog(@"formateLength = %zd", formateLength);
-    
-    // 每两位添加一个空格
-    NSMutableString *endStr = [NSMutableString stringWithString:str];
-    
-    for (int i = 0; i < formateLength; ++i)
-    {
-        if (i > 0 && (i+1) % 3 == 0)
-        {
-            NSString *tempStr = [endStr substringToIndex:i];
-            tempStr = [tempStr stringByAppendingString:@" "];
-            [endStr replaceCharactersInRange:NSMakeRange(0, i) withString:tempStr];
-            
-        }
-    }
-    
-    return endStr;
-}
-
-
-- (UITableView *)tableView
-{
-    if (_tableView == nil)
-    {
-        UIView *tableView = self.superview;
-        if (![tableView isKindOfClass:[UITableView class]] && tableView)
-        {
-            _tableView = (UITableView *)(tableView.superview);
-        }
-    }
-    return _tableView;
-}
 
 @end
